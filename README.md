@@ -19,4 +19,9 @@ Compile [iNotes-exporter](https://github.com/javabean/iNotes-exporter) and place
 Running
 -------
 
-Use the `.sh` or `.cmd` launcher.
+Use the `.sh` or `.cmd` launcher:
+
+	launch.sh [optional .nsf archive file]
+
+By default, archive files are in `C:\Users\<you>\AppData\Local\Lotus\Notes\Data\archive`
+
