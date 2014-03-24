@@ -228,7 +228,10 @@ public class NSFExporter {
 		message.size   = document.getSize();
 		message.date   = lnDataTime2Date(document.getCreated());//FIXME 1. document.getItemValue(DOCUMENT_PostedDate)  or  2. document.getItemValue(DOCUMENT_DeliveredDate)
 		StringWriter buff = new StringWriter(4096);
-		writeOutputMIME(document, buff);
+		if (! writeOutputMIME(document, buff)) {
+			log.error("Can not convert document {} | {} to MIME; skipping", message.noteid, message.unid);
+			return;
+		}
 		Iterator<String> mime = new WriterToIteratorAdaptor(buff);
 		try {
 			writer.openFile(folderChainStr, message);
@@ -284,7 +287,7 @@ public class NSFExporter {
 //		mimeEntity.recycle();
 //	}
 
-	protected static void convertToMime(Document doc) throws NotesException {
+	protected static boolean convertToMime(Document doc) throws NotesException {
 		if (doc.getMIMEEntity("Body") == null) {//$NON-NLS-1$
 			doc.removeItem("$KeepPrivate");//$NON-NLS-1$
 			// choose between the 3 conversion alternatives, depending on RichTextItem presence
@@ -311,6 +314,7 @@ public class NSFExporter {
 				doc.convertToMIME(Document.CVT_RT_TO_PLAINTEXT);
 			}
 		}
+		return doc.getMIMEEntity("Body") != null;
 	}
 
 	private static void writeOutputMIME(Document doc, File outDir) throws NotesException, IOException {
@@ -319,9 +323,11 @@ public class NSFExporter {
 		Writer output = new FileWriter(outFile);
 		writeOutputMIME(doc, output);
 	}
-	protected static void writeOutputMIME(Document doc, Writer output) throws NotesException, IOException {
+	protected static boolean writeOutputMIME(Document doc, Writer output) throws NotesException, IOException {
 		// access document as mime parts
-		convertToMime(doc);
+		if (! convertToMime(doc)) {
+			return false;
+		}
 		MIMEEntity mE = doc.getMIMEEntity("Body");//$NON-NLS-1$
 		assert mE != null;
 
@@ -397,6 +403,7 @@ public class NSFExporter {
 			output.close();
 		}
 
+		return true;
 	} // end WriteOutputMIME
 
 

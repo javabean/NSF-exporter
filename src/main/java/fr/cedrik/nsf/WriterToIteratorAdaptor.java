@@ -1,7 +1,6 @@
 package fr.cedrik.nsf;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Iterator;
 
@@ -13,7 +12,7 @@ class WriterToIteratorAdaptor implements Iterator<String> {
 	protected String nextLine = null;
 
 	public WriterToIteratorAdaptor(StringWriter buffer) {
-		in = new BufferedReader(new StringReader(buffer.toString()));
+		in = new BufferedReader(new StringBufferReader(buffer.getBuffer()));
 		readNextLine();
 	}
 
