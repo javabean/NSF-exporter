@@ -9,5 +9,5 @@ export NOTES_PATH=/Applications/Lotus\ Notes.app/Contents/MacOS
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$NOTES_PATH"
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:"$NOTES_PATH"
 export CLASSPATH="lib/*":"$NOTES_PATH/jvm/lib/ext/Notes.jar":"target/*"
-java -d32 -Xmx384M -Djava.library.path="$NOTES_PATH" -cp "$CLASSPATH" fr.cedrik.nsf.Main $*
+java -d32 -Xmx512M -Djava.library.path="$NOTES_PATH" -cp "$CLASSPATH" fr.cedrik.nsf.Main $*
 

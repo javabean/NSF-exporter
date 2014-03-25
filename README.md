@@ -19,9 +19,12 @@ Compile [iNotes-exporter](https://github.com/javabean/iNotes-exporter) and place
 Running
 -------
 
+Quit Lotus Notes
+
 Use the `.sh` or `.cmd` launcher:
 
 	launch.sh [optional .nsf archive file]
 
-By default, archive files are in `C:\Users\<you>\AppData\Local\Lotus\Notes\Data\archive`
+By default, archive files are in `C:\Users\<you>\AppData\Local\Lotus\Notes\Data\archive` or `/Users/<you>/Library/Application Support/Lotus Notes Data/archive/`
 
+If you stop the process for any reason, be sure to terminate the associated `java` process in Activity Manager / Task Manager (this is a Lotus Notes limitation)!

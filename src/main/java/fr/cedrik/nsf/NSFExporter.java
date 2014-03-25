@@ -189,10 +189,6 @@ public class NSFExporter {
 				log.trace("viewEntry.isTotal\t: " + viewEntry.isTotal());
 				log.trace("viewEntry.isValid\t: " + viewEntry.isValid());
 				Document document = viewEntry.getDocument();
-				if (document.isDeleted()) {
-					log.debug("Skipping deleted document: ", document.getUniversalID());
-					continue;
-				}
 				exportDocument(document, writer, folderChainName);
 				document.recycle();
 				ViewEntry veBackup = viewEntry;
@@ -204,6 +200,10 @@ public class NSFExporter {
 	}
 
 	protected void exportDocument(Document document, BaseZipWriter writer, String folderChainStr) throws NotesException, IOException {
+		if (document.isDeleted()) {
+			log.debug("Skipping deleted document: ", document.getUniversalID());
+			return;
+		}
 		log.info("Exporting document: {} | {} ({} bytes)", document.getNoteID(), document.getUniversalID(), document.getSize());
 		log.trace("document.NameOfProfile\t: " + document.getNameOfProfile());
 		log.debug("document.isDeleted\t: " + document.isDeleted());
@@ -287,7 +287,7 @@ public class NSFExporter {
 //		mimeEntity.recycle();
 //	}
 
-	protected static boolean convertToMime(Document doc) throws NotesException {
+	protected boolean convertToMime(Document doc) throws NotesException {
 		if (doc.getMIMEEntity("Body") == null) {//$NON-NLS-1$
 			doc.removeItem("$KeepPrivate");//$NON-NLS-1$
 			// choose between the 3 conversion alternatives, depending on RichTextItem presence
@@ -304,26 +304,33 @@ public class NSFExporter {
 				}
 				item.recycle();
 			}
-			if (hasRichText) {
-				if (hasText) {
-					doc.convertToMIME(Document.CVT_RT_TO_PLAINTEXT_AND_HTML);
+			try {
+				if (hasRichText) {
+					if (hasText) {
+						log.trace("Converting document {} to HTML and TEXT", doc.getUniversalID());
+						doc.convertToMIME(Document.CVT_RT_TO_PLAINTEXT_AND_HTML);
+					} else {
+						log.trace("Converting document {} to HTML", doc.getUniversalID());
+						doc.convertToMIME(Document.CVT_RT_TO_HTML);
+					}
 				} else {
-					doc.convertToMIME(Document.CVT_RT_TO_HTML);
+					log.trace("Converting document {} to TEXT", doc.getUniversalID());
+					doc.convertToMIME(Document.CVT_RT_TO_PLAINTEXT);
 				}
-			} else {
-				doc.convertToMIME(Document.CVT_RT_TO_PLAINTEXT);
+			} catch (NotesException ne) {
+				log.warn("Lotus Notes error while converting document {} to MIME: {}", doc.getNoteID(), ne.getLocalizedMessage());
 			}
 		}
 		return doc.getMIMEEntity("Body") != null;
 	}
 
-	private static void writeOutputMIME(Document doc, File outDir) throws NotesException, IOException {
+	private void writeOutputMIME(Document doc, File outDir) throws NotesException, IOException {
 		String noteId = doc.getNoteID();//doc.getUniversalID();
 		File outFile = new File(outDir, noteId + ".eml");
 		Writer output = new FileWriter(outFile);
 		writeOutputMIME(doc, output);
 	}
-	protected static boolean writeOutputMIME(Document doc, Writer output) throws NotesException, IOException {
+	protected boolean writeOutputMIME(Document doc, Writer output) throws NotesException, IOException {
 		// access document as mime parts
 		if (! convertToMime(doc)) {
 			return false;
@@ -413,6 +420,7 @@ public class NSFExporter {
 	protected static String encodeFolderName(String folderName) {
 //		return BASE64MailboxEncoder.encode(folderName).replace("/", "&AC8-");
 //		return StringUtils.replaceChars(folderName, "\\/:*?\"<>|", "_________");
+		// '\' is used a folder delimiter in Lotus Notes
 		return StringUtils.replaceChars(folderName, "/:*?\"<>|", "________");
 	}
 
