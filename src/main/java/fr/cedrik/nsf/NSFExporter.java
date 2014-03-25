@@ -227,7 +227,7 @@ public class NSFExporter {
 		message.noteid = document.getNoteID();
 		message.size   = document.getSize();
 		message.date   = lnDataTime2Date(document.getCreated());//FIXME 1. document.getItemValue(DOCUMENT_PostedDate)  or  2. document.getItemValue(DOCUMENT_DeliveredDate)
-		StringWriter buff = new StringWriter(4096);
+		StringWriter buff = new StringWriter(Math.max(16384, (int)(document.getSize()*1.37-8000))); // linear regression tests MIME / Notes document size
 		if (! writeOutputMIME(document, buff)) {
 			log.error("Can not convert document {} | {} to MIME; skipping", message.noteid, message.unid);
 			return;
