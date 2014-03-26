@@ -107,6 +107,9 @@ public class NSFExporter {
 			if (StringUtils.isEmpty(dbFileName)) {
 				db = session.getDbDirectory(null).openMailDatabase();
 			} else {
+				if ( ! new File(dbFileName).canRead()) {
+					throw new FileNotFoundException(dbFileName);
+				}
 				db = session.getDatabase(null, dbFileName, false); // Use this for opening archives!
 			}
 			if (db == null || ! db.isOpen()) {
@@ -227,7 +230,14 @@ public class NSFExporter {
 		message.noteid = document.getNoteID();
 		message.size   = document.getSize();
 		message.date   = lnDataTime2Date(document.getCreated());//FIXME 1. document.getItemValue(DOCUMENT_PostedDate)  or  2. document.getItemValue(DOCUMENT_DeliveredDate)
-		StringWriter buff = new StringWriter(Math.max(16384, (int)(document.getSize()*1.37-8000))); // linear regression tests MIME / Notes document size
+		int expectedMIMEsize = Math.max(16384, (int)(document.getSize()*1.37-8000)); // linear regression tests MIME / Notes document size
+		StringWriter buff;
+		if (expectedMIMEsize <= SMALL_MESSAGES_BUFFER.getBuffer().capacity() / 2) {
+			buff = SMALL_MESSAGES_BUFFER;
+			buff.getBuffer().setLength(0);
+		} else {
+			buff = new StringWriter(expectedMIMEsize);
+		}
 		if (! writeOutputMIME(document, buff)) {
 			log.error("Can not convert document {} | {} to MIME; skipping", message.noteid, message.unid);
 			return;
@@ -243,6 +253,10 @@ public class NSFExporter {
 			}
 		}
 	}
+	/**
+	 * Re-usable StringWriter cache for "small" messages, to avoid creating 1000s of short-lived objects
+	 */
+	private static final StringWriter SMALL_MESSAGES_BUFFER = new StringWriter(512*1024);
 
 //	@Deprecated
 //	public static void getMIME_ManualVersion(Document document) throws NotesException {
