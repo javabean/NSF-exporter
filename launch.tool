@@ -1,5 +1,8 @@
 #/bin/sh
 
+#cd "`dirname \"$0\"`"
+cd "$(dirname "$0")"
+
 zip -qd lib/iNotes-exporter-1.*.jar META-INF/INDEX.LIST simplelogger.properties
 
 # Shared libraries path
@@ -9,5 +12,5 @@ export NOTES_PATH=/Applications/Lotus\ Notes.app/Contents/MacOS
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$NOTES_PATH"
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:"$NOTES_PATH"
 export CLASSPATH="lib/*":"$NOTES_PATH/jvm/lib/ext/Notes.jar":"target/*"
-java -d32 -Xmx1024M -Djava.library.path="$NOTES_PATH" -cp "$CLASSPATH" fr.cedrik.nsf.Main $*
+java -d32 -Xmx1024M -Djava.library.path="$NOTES_PATH" -cp "$CLASSPATH" fr.cedrik.nsf.gui.Main $*
 

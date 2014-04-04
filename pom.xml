@@ -24,8 +24,8 @@
 
 	<!-- Coordinates -->
 	<groupId>fr.cedrik.nsf</groupId>
-	<artifactId>NSF-exporter</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<artifactId>nsf-exporter</artifactId>
+	<version>2.0-SNAPSHOT</version>
 
 	<!-- Inheritance -->
 	<!--parent>
@@ -179,9 +179,9 @@
 	<!-- Project Information -->
 	<!-- - - - - - - - - - - -->
 
-	<name>iNotes-exporter</name>
+	<name>NSF-exporter</name>
 	<description>Lotus Notes NSF exporter (mbox, eml)</description>
-	<url>https://github.com/javabean/iNotes-exporter</url>
+	<url>https://github.com/javabean/NSF-exporter</url>
 	<inceptionYear>2014</inceptionYear>
 
 	<licenses>
@@ -256,7 +256,7 @@
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<!--manifestFile>META-INF/MANIFEST.MF</manifestFile-->
 						<manifest>
-							<mainClass>fr.cedrik.nsf.Main</mainClass>
+							<mainClass>fr.cedrik.nsf.gui.Main</mainClass>
 							<!--packageName>com.mycompany.app</packageName-->
 							<addClasspath>false</addClasspath>
 							<!--addExtensions/-->
@@ -282,7 +282,7 @@
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<!--manifestFile>META-INF/MANIFEST.MF</manifestFile-->
 						<manifest>
-							<mainClass>fr.cedrik.nsf.Main</mainClass>
+							<mainClass>fr.cedrik.nsf.gui.Main</mainClass>
 							<!--packageName>com.mycompany.app</packageName-->
 							<addClasspath>false</addClasspath>
 							<!--addExtensions/-->
@@ -380,10 +380,10 @@
 	<ciManagement></ciManagement>
 	<mailingLists></mailingLists>
 	<scm>
-		<connection>git://github.com/javabean/iNotes-exporter.git</connection>
-		<developerConnection>git@github.com:javabean/iNotes-exporter.git</developerConnection>
+		<connection>git://github.com/javabean/NSF-exporter.git</connection>
+		<developerConnection>git@github.com:javabean/NSF-exporter.git</developerConnection>
 		<tag>HEAD</tag>
-		<url>git://github.com/javabean/iNotes-exporter.git</url>
+		<url>git://github.com/javabean/NSF-exporter.git</url>
 	</scm>
 
 	<!-- Maven Environment -->
