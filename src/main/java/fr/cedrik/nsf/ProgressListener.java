@@ -10,5 +10,5 @@ package fr.cedrik.nsf;
  */
 public interface ProgressListener {
 	void setTotalNumberOfDocuments(int n);
-	void documentExported(String notesUNID);
+	void documentExported(String notesID);
 }

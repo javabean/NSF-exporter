@@ -130,14 +130,24 @@ public class NSFExporter {
 			if (platform == null) {
 				platform = Platform.getInstance(session.getPlatform());
 			}
-			String currentDate = DateFormatUtils.ISO_DATE_FORMAT.format(new Date());
-			if (StringUtils.isBlank(exportArchiveFileName)) {
-				exportArchiveFileName = FilenameUtils.removeExtension(db.getFileName()) + '_' + platform.getMBoxTypeString() + '_'+currentDate+".zip";
+			final String currentDate = DateFormatUtils.ISO_DATE_FORMAT.format(new Date());
+			File exportArchiveFile;
+			{
+				final String defaultExportArchiveFileName = FilenameUtils.removeExtension(db.getFileName()) + '_' + platform.getMBoxTypeString() + '_'+currentDate+".zip";
+				if (StringUtils.isBlank(exportArchiveFileName)) {
+					exportArchiveFileName = defaultExportArchiveFileName;
+				}
+				exportArchiveFile = new File(exportArchiveFileName);
+				if (exportArchiveFile.isDirectory()) {
+					exportArchiveFile = new File(exportArchiveFile, defaultExportArchiveFileName);
+				} else {
+					if ( ! FilenameUtils.isExtension(exportArchiveFileName.toLowerCase(), "zip")) {
+						exportArchiveFileName += ".zip";
+					}
+					exportArchiveFile = new File(exportArchiveFileName);
+				}
 			}
-			if ( ! exportArchiveFileName.toLowerCase().endsWith(".zip")) {
-				exportArchiveFileName += ".zip";
-			}
-			ZipOutputStream outZip = new ZipOutputStream(new FileOutputStream(exportArchiveFileName));
+			ZipOutputStream outZip = new ZipOutputStream(new FileOutputStream(exportArchiveFile));
 			outZip.setComment("Lotus Notes archive " + db.getFileName() + " for " + session.getCommonUserName() + " at " + DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(new Date()));
 			BaseZipWriter writer = platform.getZipWriter(outZip, FilenameUtils.removeExtension(db.getFileName())+'_'+currentDate);
 
@@ -249,7 +259,7 @@ public class NSFExporter {
 		} finally {
 			writer.closeFile(message);
 			if (progressListener != null) {
-				progressListener.documentExported(message.unid);
+				progressListener.documentExported(message.noteid);
 			}
 		}
 	}
