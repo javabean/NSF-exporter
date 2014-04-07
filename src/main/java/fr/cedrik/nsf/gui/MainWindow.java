@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
@@ -172,6 +173,13 @@ public class MainWindow extends JFrame {
 		ActionListener actionlistener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				int confirm = JOptionPane.showConfirmDialog(MainWindow.this,
+						"Lotus Notes should not be running while exporting your emails.\nDid you quit Lotus Notes?",
+						"Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (confirm != JOptionPane.YES_OPTION) {
+					return;
+				}
+
 				String notesPassword = StringUtils.isEmpty(lotusPasswordTextField.getText()) ? null : lotusPasswordTextField.getText(); // null: ask on console
 				Platform platform = null; // null: auto-detect
 				String emailNSFFileName = ( ! archiveTextField.isEnabled() || StringUtils.isEmpty(archiveTextField.getText())) ? null : archiveTextField.getText(); // null: current email nsf file (i.e. not an archive)
