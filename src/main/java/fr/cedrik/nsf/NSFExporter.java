@@ -239,7 +239,7 @@ public class NSFExporter {
 		message.unid   = document.getUniversalID();
 		message.noteid = document.getNoteID();
 		message.size   = document.getSize();
-		message.date   = lnDataTime2Date(document.getCreated());//FIXME 1. document.getItemValue(DOCUMENT_PostedDate)  or  2. document.getItemValue(DOCUMENT_DeliveredDate)
+		message.date   = getMessageDate(document);
 		int expectedMIMEsize = Math.max(16384, (int)(document.getSize()*1.37-8000)); // linear regression tests MIME / Notes document size
 		StringWriter buff;
 		if (expectedMIMEsize <= SMALL_MESSAGES_BUFFER.getBuffer().capacity() / 2) {
@@ -263,6 +263,34 @@ public class NSFExporter {
 			}
 		}
 	}
+
+	protected Date getMessageDate(Document document) throws NotesException {
+		DateTime date = document.getCreated();
+		if (date == null) {
+			Vector dateTimeArray = document.getItemValueDateTimeArray("PostedDate");
+			if (dateTimeArray != null && ! dateTimeArray.isEmpty()) {
+				date = (DateTime) dateTimeArray.get(0);
+			}
+		}
+		if (date == null) {
+			Vector dateTimeArray = document.getItemValueDateTimeArray("DeliveredDate");
+			if (dateTimeArray != null && ! dateTimeArray.isEmpty()) {
+				date = (DateTime) dateTimeArray.get(0);
+			}
+		}
+		if (date == null) {
+			date = document.getInitiallyModified();
+		}
+		if (date == null) {
+			date = document.getLastModified();
+		}
+		if (date != null) {
+			return lnDataTime2Date(date);
+		} else {
+			return new Date(0);
+		}
+	}
+
 	/**
 	 * Re-usable StringWriter cache for "small" messages, to avoid creating 1000s of short-lived objects
 	 */
