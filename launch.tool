@@ -1,4 +1,7 @@
 #/bin/sh
+# Local Variables:
+# coding: iso-8859-15-unix
+# End:
 
 #cd "`dirname \"$0\"`"
 cd "$(dirname "$0")"
@@ -24,4 +27,3 @@ export DYLD_LIBRARY_PATH
 CLASSPATH="lib/*":"$NOTES_PATH/jvm/lib/ext/Notes.jar":"target/*"
 export CLASSPATH
 java -d32 -Xmx1024M -Djava.library.path="$NOTES_PATH" -cp "$CLASSPATH" fr.cedrik.nsf.gui.Main $*
-
