@@ -427,8 +427,12 @@ public class NSFExporter {
 				while (mChild != null) {
 					// convert binary parts to base-64
 					if (mChild.getEncoding() == MIMEEntity.ENC_IDENTITY_BINARY) {
-						mChild.encodeContent(MIMEEntity.ENC_BASE64);
-						// get Headers again, because changed
+						try {
+							mChild.encodeContent(MIMEEntity.ENC_BASE64);
+							// get Headers again, because changed
+						} catch (NotesException ne) {
+							log.warn("Exception while re-encoding binary part: " + ne.getLocalizedMessage());
+						}
 					}
 
 					preamble = mChild.getPreamble();

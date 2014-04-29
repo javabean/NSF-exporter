@@ -26,4 +26,4 @@ DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:"$NOTES_PATH"
 export DYLD_LIBRARY_PATH
 CLASSPATH="lib/*":"$NOTES_PATH/jvm/lib/ext/Notes.jar":"target/*"
 export CLASSPATH
-java -d32 -Xmx1024M -Djava.library.path="$NOTES_PATH" -cp "$CLASSPATH" fr.cedrik.nsf.gui.Main $*
+java -d32 -Xmx1536M -Djava.library.path="$NOTES_PATH" -cp "$CLASSPATH" fr.cedrik.nsf.gui.Main $*
