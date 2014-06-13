@@ -55,6 +55,10 @@ public class NSFExportWorker extends SwingWorker<Void, Void> {
 			// TODO Auto-generated catch block
 			lastError.printStackTrace();
 			JOptionPane.showMessageDialog(null, lastError.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+		} else {
+			JOptionPane.showMessageDialog(null,
+					"All done!",
+					"Export is finished", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (postAction != null) {
 			postAction.run();
