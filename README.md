@@ -35,3 +35,5 @@ Credits
 -------
 
 GUI code based on contribution by Émilie CHIROL. Thanks Émilie!
+
+A big thank you too to Thierry Bur who is a fantastic beta-tester!

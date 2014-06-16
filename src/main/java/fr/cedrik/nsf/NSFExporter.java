@@ -391,83 +391,84 @@ public class NSFExporter {
 		assert mE != null;
 
 		try {
-			String headers = mE.getHeaders();
-			int encoding = mE.getEncoding();
-
-			// message envelope. If no MIME-version header, add one
-			if (headers.indexOf("MIME-Version:") < 0) {//$NON-NLS-1$
-				output.write("MIME-Version: 1.0\n");//$NON-NLS-1$
-			}
-			output.write(headers);
-			if (!headers.endsWith("\n")) {
-				output.write("\n");
-			}
-//			Vector<MIMEHeader> mimeHeaders = mE.getHeaderObjects();
-//			for (MIMEHeader mimeHeader : mimeHeaders) {
-//				output.append(mimeHeader.getHeaderName() + ": " + mimeHeader.getHeaderValAndParams() + "\r\n");
-//				mimeHeader.recycle();
-//			}
-//			output.write("\n");
-
-			// for multipart, usually no main-msg content
-			String content = mE.getContentAsText(); // includes Preamble
-			if (content != null && content.trim().length() > 0) {
-				output.write(content);
-				output.write("\n");
-			}
-
-			// begin of main envelope
-			output.write(mE.getBoundaryStart());
-
-			// For multipart, examine each child entity,
-			// re-code to base64 if necessary
-			if (mE.getContentType().startsWith("multipart")) {//$NON-NLS-1$
-				String preamble = mE.getPreamble();
-				MIMEEntity mChild = mE.getFirstChildEntity();
-				while (mChild != null) {
-					// convert binary parts to base-64
-					if (mChild.getEncoding() == MIMEEntity.ENC_IDENTITY_BINARY) {
-						try {
-							mChild.encodeContent(MIMEEntity.ENC_BASE64);
-							// get Headers again, because changed
-						} catch (NotesException ne) {
-							log.warn("Exception while re-encoding binary part: " + ne.getLocalizedMessage());
-						}
-					}
-
-					preamble = mChild.getPreamble();
-					content = mChild.getBoundaryStart();
-					output.write(content);
-					if (!content.endsWith("\n")) {
-						output.write("\n");
-					}
-					content = mChild.getHeaders(); // get after encoding content to B64, because changed
-					output.write(content);
-					if (!content.endsWith("\n")) {
-						output.write("\n");
-					}
-					output.write("\n");
-
-					content = mChild.getContentAsText(); // includes Preamble
-					if (content != null && content.length() > 0) {
-						output.write(content);
-					}
-					output.write(mChild.getBoundaryEnd());
-
-					MIMEEntity oldChild = mChild;
-					mChild = mChild.getNextSibling();
-					oldChild.recycle();
-				} // end while
-			} // end multipart
-
-			// end of main envelope
-			output.write(mE.getBoundaryEnd());
+			writeMIMEEntity(output, mE, true);
 		} finally {
 			output.close();
 		}
 
 		return true;
 	} // end WriteOutputMIME
+
+	/**
+	 * @param output
+	 * @param mE
+	 * @throws NotesException
+	 * @throws IOException
+	 */
+	protected void writeMIMEEntity(Writer output, MIMEEntity mE, boolean appendMIMEVersion) throws IOException, NotesException {
+		// convert binary parts to base-64
+		if (mE.getEncoding() == MIMEEntity.ENC_IDENTITY_BINARY) {
+			try {
+				mE.encodeContent(MIMEEntity.ENC_BASE64);
+				// get Headers again, because changed
+			} catch (NotesException ne) {
+				log.warn("Exception while re-encoding binary part: " + ne.getLocalizedMessage());
+			}
+		}
+
+		// begin of main envelope
+		writeWithEOL(output, mE.getBoundaryStart());
+
+		String headers = mE.getHeaders(); // get after encoding content to B64, because changed
+		// message envelope. If no MIME-version header, add one
+		if (appendMIMEVersion && headers.indexOf("MIME-Version:") < 0) {//$NON-NLS-1$
+			output.write("MIME-Version: 1.0"+NOTES_EOL);//$NON-NLS-1$
+		}
+		writeWithEOL(output, headers);
+		if (StringUtils.isNotEmpty(headers) && ! headers.endsWith(NOTES_EOL+NOTES_EOL)) {
+			output.write(NOTES_EOL);
+		}
+//		Vector<MIMEHeader> mimeHeaders = mE.getHeaderObjects();
+//		for (MIMEHeader mimeHeader : mimeHeaders) {
+//			output.append(mimeHeader.getHeaderName() + ": " + mimeHeader.getHeaderValAndParams() + "\r\n");
+//			mimeHeader.recycle();
+//		}
+//		output.write("\r\n");
+
+		String preamble = mE.getPreamble();
+		// for multipart, usually no main-msg content
+		String content = mE.getContentAsText(); // includes Preamble
+		writeWithEOL(output, content);
+
+		// For multipart, examine each child entity,
+		// re-code to base64 if necessary
+		if (mE.getContentType().startsWith("multipart")) {//$NON-NLS-1$
+			MIMEEntity mChild = mE.getFirstChildEntity();
+			while (mChild != null) {
+				writeMIMEEntity(output, mChild, false);
+
+				MIMEEntity oldChild = mChild;
+				mChild = mChild.getNextSibling();
+				oldChild.recycle();
+			} // end while
+		} else if (mE.getFirstChildEntity() != null) {
+			log.warn("Non-multipart MIMEEntity has children! " + mE);
+		} // end multipart
+
+		// end of main envelope
+		writeWithEOL(output, mE.getBoundaryEnd());
+//		writeWithEOL(output, mE.getEpilogue());
+	}
+
+	protected void writeWithEOL(Writer output, String text) throws IOException {
+		if (StringUtils.isNotEmpty(text)) {
+			output.write(text);
+			if (!text.endsWith(NOTES_EOL)) {
+				output.write(NOTES_EOL);
+			}
+		}
+	}
+	private static final String NOTES_EOL = "\r\n";//$NON-NLS-1$
 
 
 	/**
