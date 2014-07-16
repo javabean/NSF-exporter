@@ -5,9 +5,9 @@ package fr.cedrik.nsf;
 
 import java.util.zip.ZipOutputStream;
 
-import fr.cedrik.inotes.fs.BaseZipWriter;
-import fr.cedrik.inotes.fs.maildir.EMLZipWriter;
-import fr.cedrik.inotes.fs.mbox.MBoxrdZipWriter;
+import fr.cedrik.email.fs.BaseZipWriter;
+import fr.cedrik.email.fs.maildir.EMLZipWriter;
+import fr.cedrik.email.fs.mbox.MBoxrdZipWriter;
 
 /**
  * @author C&eacute;drik LIME

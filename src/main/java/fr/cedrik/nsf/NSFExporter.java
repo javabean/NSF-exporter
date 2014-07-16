@@ -37,8 +37,8 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.cedrik.email.fs.BaseZipWriter;
 import fr.cedrik.inotes.MessageMetaData;
-import fr.cedrik.inotes.fs.BaseZipWriter;
 
 /**
  * @author C&eacute;drik LIME
